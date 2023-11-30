@@ -2,6 +2,7 @@ from django.shortcuts import render
 import requests
 from bs4 import BeautifulSoup
 from django.http import JsonResponse
+import json
 
 def create_search_url(game_name):
     search_term = "+".join(game_name.split())
@@ -14,6 +15,22 @@ def create_search_url_epic(game_name):
 def create_search_url_nuuvem(game_name):
     search_term = "+".join(game_name.split())
     return f"https://www.nuuvem.com/br-pt/catalog/page/1/search/{search_term}"
+
+def create_search_url_gmg(game_name):
+    search_term = "%20".join(game_name.split())
+    return f"https://www.greenmangaming.com/pt/search/?query={search_term}"
+
+def create_search_url_gog(game_name):
+    search_term = "%20".join(game_name.split())
+    return f"https://www.gog.com/en/games?query={search_term}"
+    
+def create_search_url_instant_gaming(game_name):
+    search_term = "%20".join(game_name.split())
+    return f"https://www.instant-gaming.com/pt/pesquisar/?q={search_term}"
+
+def create_search_url_eneba(game_name):
+    search_term = "%20".join(game_name.split())
+    return f"https://www.eneba.com/store/all?text={search_term}"
 
 def scrape_steam_search(game_name):
     url = create_search_url(game_name)
@@ -84,15 +101,94 @@ def scrape_nuuvem_search(game_name):
 
     return {'title': title, 'price': price}
 
+def scrape_gmg_search(game_name):
+    url = create_search_url_gmg(game_name)
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    first_item = soup.find('li', class_='ais-Hits-item')
+    if not first_item:
+        return "Nenhum resultado encontrado"
+
+    title_tag = first_item.find('p', class_='prod-name')
+    title = title_tag.text.strip() if title_tag else "Título não encontrado"
+
+    price_tag = first_item.find('span', class_='current-price')
+    price = price_tag.text.strip() if price_tag else "Preço não encontrado"
+
+    return {'title': title, 'price': price}
+
+def scrape_gog_search(game_name):
+    url = create_search_url_gog(game_name)
+    print(f"URL da GOG: {url}")
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    first_item = soup.find('product-tile', class_='ng-star-inserted')
+    if not first_item:
+        return "Nenhum resultado encontrado"
+
+    title_tag = first_item.find('div', class_='product-tile__title')
+    title = title_tag.text.strip() if title_tag else "Título não encontrado"
+
+    price_tag = first_item.find('span', class_='final-value')
+    price = price_tag.text.strip() if price_tag else "Preço não encontrado"
+
+    return {'title': title, 'price': price}
+
+def scrape_instant_gaming_search(game_name):
+    url = create_search_url_instant_gaming(game_name)
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    first_item = soup.find('div', class_='item')
+    if not first_item:
+        return "Nenhum resultado encontrado"
+
+    title_tag = first_item.find('span', class_='title')
+    title = title_tag.text.strip() if title_tag else "Título não encontrado"
+
+    price_tag = first_item.find('div', class_='price')
+    price = price_tag.text.strip() if price_tag else "Preço não encontrado"
+
+    return {'title': title, 'price': price}
+
+def scrape_eneba_search(game_name):
+    url = create_search_url_eneba(game_name)
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    first_item = soup.find('div', class_='pFaGHa')
+    if not first_item:
+        return "Nenhum resultado encontrado"
+
+    title_tag = first_item.find('span', class_='YLosEL')
+    title = title_tag.text.strip() if title_tag else "Título não encontrado"
+
+    price_tag = first_item.find('span', class_='L5ErLT')
+    price = price_tag.text.strip() if price_tag else "Preço não encontrado"
+
+    return {'title': title, 'price': price}
+
 def game_search_view(request, game_name):
     steam_results = scrape_steam_search(game_name)
     epic_results = scrape_epic_search(game_name)
     nuuvem_results = scrape_nuuvem_search(game_name)
+    gmg_results = scrape_gmg_search(game_name)
+    gog_results = scrape_gog_search(game_name)
+    ig_results = scrape_instant_gaming_search(game_name)
+    eneba_results = scrape_eneba_search(game_name)
     
     combined_results = {
         'steam': steam_results,
         'epic': epic_results,
-        'nuuvem': nuuvem_results
+        'nuuvem': nuuvem_results,
+        'green_man_gaming': gmg_results,
+        'gog': gog_results,
+        'ig': ig_results,
+        'eneba': eneba_results
     }
 
     return JsonResponse(combined_results)
