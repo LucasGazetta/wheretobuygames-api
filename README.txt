@@ -1,5 +1,8 @@
 Manual para utilizar o Backend (Python com Django e BeautifulSoup)
 
+Antes de iniciar, certifique-se de que o Docker está instalado em sua máquina. 
+Visite https://www.docker.com/ para instruções de instalação.
+
 1. Construindo a Imagem Docker
     1.1 Navegue até o diretório do projeto backend no terminal.
 
