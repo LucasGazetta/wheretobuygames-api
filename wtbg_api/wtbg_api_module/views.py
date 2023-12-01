@@ -40,7 +40,7 @@ def scrape_steam_search(game_name):
 
     first_item = soup.find('a', class_='search_result_row')
     if not first_item:
-        return "Nenhum resultado encontrado"
+        return "Not Found"
 
     title_tag = first_item.find('span', class_='title')
     title = title_tag.text if title_tag else "Título não encontrado"
@@ -48,7 +48,7 @@ def scrape_steam_search(game_name):
     price_tag = first_item.find('div', class_='discount_final_price')
     price = price_tag.text if price_tag else "Preço não encontrado"
 
-    return {'title': title, 'price': price}
+    return {'title': title, 'price': price, 'url': url}
 
 def scrape_epic_search(game_name):
     url = create_search_url_epic(game_name)
@@ -58,12 +58,12 @@ def scrape_epic_search(game_name):
 
     results_container = soup.find('div', class_='css-sbt18p')
     if not results_container:
-        return "Nenhum container encontrado"
+        return "Not Found"
 
     first_item = soup.find('li', class_='css-lrwy1y')
 
     if not first_item:
-        return "Nenhum resultado encontrado"
+        return "Not Found"
 
     title_tag = first_item.find('div', class_='css-rgqwpc')
     title = title_tag.text if title_tag else "Título não encontrado"
@@ -71,7 +71,7 @@ def scrape_epic_search(game_name):
     price_tag = first_item.find('span', class_='css-119zqif')
     price = price_tag.text if price_tag else "Preço não encontrado"
 
-    return {'title': title, 'price': price}
+    return {'title': title, 'price': price, 'url': url}
 
 def scrape_nuuvem_search(game_name):
     url = create_search_url_nuuvem(game_name)
@@ -82,7 +82,7 @@ def scrape_nuuvem_search(game_name):
     first_item = soup.find('div', class_='product__available')
 
     if not first_item:
-        return "Nenhum resultado encontrado"
+        return "Not Found"
 
     title_tag = first_item.find('h3', class_='product-title')
     title = title_tag.text if title_tag else "Título não encontrado"
@@ -99,7 +99,7 @@ def scrape_nuuvem_search(game_name):
     else:
         price = "Preço não encontrado"
 
-    return {'title': title, 'price': price}
+    return {'title': title, 'price': price, 'url': url}
 
 def scrape_gmg_search(game_name):
     url = create_search_url_gmg(game_name)
@@ -108,7 +108,7 @@ def scrape_gmg_search(game_name):
 
     first_item = soup.find('li', class_='ais-Hits-item')
     if not first_item:
-        return "Nenhum resultado encontrado"
+        return "Not Found"
 
     title_tag = first_item.find('p', class_='prod-name')
     title = title_tag.text.strip() if title_tag else "Título não encontrado"
@@ -116,7 +116,7 @@ def scrape_gmg_search(game_name):
     price_tag = first_item.find('span', class_='current-price')
     price = price_tag.text.strip() if price_tag else "Preço não encontrado"
 
-    return {'title': title, 'price': price}
+    return {'title': title, 'price': price, 'url': url}
 
 def scrape_gog_search(game_name):
     url = create_search_url_gog(game_name)
@@ -126,7 +126,7 @@ def scrape_gog_search(game_name):
 
     first_item = soup.find('product-tile', class_='ng-star-inserted')
     if not first_item:
-        return "Nenhum resultado encontrado"
+        return "Not Found"
 
     title_tag = first_item.find('div', class_='product-tile__title')
     title = title_tag.text.strip() if title_tag else "Título não encontrado"
@@ -134,7 +134,7 @@ def scrape_gog_search(game_name):
     price_tag = first_item.find('span', class_='final-value')
     price = price_tag.text.strip() if price_tag else "Preço não encontrado"
 
-    return {'title': title, 'price': price}
+    return {'title': title, 'price': price, 'url': url}
 
 def scrape_instant_gaming_search(game_name):
     url = create_search_url_instant_gaming(game_name)
@@ -144,7 +144,7 @@ def scrape_instant_gaming_search(game_name):
 
     first_item = soup.find('div', class_='item')
     if not first_item:
-        return "Nenhum resultado encontrado"
+        return "Not Found"
 
     title_tag = first_item.find('span', class_='title')
     title = title_tag.text.strip() if title_tag else "Título não encontrado"
@@ -152,7 +152,7 @@ def scrape_instant_gaming_search(game_name):
     price_tag = first_item.find('div', class_='price')
     price = price_tag.text.strip() if price_tag else "Preço não encontrado"
 
-    return {'title': title, 'price': price}
+    return {'title': title, 'price': price, 'url': url}
 
 def scrape_eneba_search(game_name):
     url = create_search_url_eneba(game_name)
@@ -162,7 +162,7 @@ def scrape_eneba_search(game_name):
 
     first_item = soup.find('div', class_='pFaGHa')
     if not first_item:
-        return "Nenhum resultado encontrado"
+        return "Not Found"
 
     title_tag = first_item.find('span', class_='YLosEL')
     title = title_tag.text.strip() if title_tag else "Título não encontrado"
@@ -170,7 +170,7 @@ def scrape_eneba_search(game_name):
     price_tag = first_item.find('span', class_='L5ErLT')
     price = price_tag.text.strip() if price_tag else "Preço não encontrado"
 
-    return {'title': title, 'price': price}
+    return {'title': title, 'price': price, 'url': url}
 
 def game_search_view(request, game_name):
     steam_results = scrape_steam_search(game_name)
@@ -182,13 +182,13 @@ def game_search_view(request, game_name):
     eneba_results = scrape_eneba_search(game_name)
     
     combined_results = {
-        'steam': steam_results,
-        'epic': epic_results,
-        'nuuvem': nuuvem_results,
-        'green_man_gaming': gmg_results,
-        'gog': gog_results,
-        'ig': ig_results,
-        'eneba': eneba_results
+        'Steam': steam_results,
+        'Epic Games': epic_results,
+        'Nuuvem': nuuvem_results,
+        'Green Man Gaming': gmg_results,
+        'GoG': gog_results,
+        'Instant Gaming': ig_results,
+        'Eneba': eneba_results
     }
 
     return JsonResponse(combined_results)
